@@ -33,6 +33,9 @@ RUN git clone --depth 1 --branch 1.3.2 https://github.com/Brainicism/bgutil-ytdl
 WORKDIR /opt/bgutil-ytdlp-pot-provider/server
 RUN npm ci && npx tsc
 
+# Symlink to /root so script-node and script-deno providers find generate_once scripts
+RUN ln -s /opt/bgutil-ytdlp-pot-provider /root/bgutil-ytdlp-pot-provider
+
 # Install bgutil yt-dlp plugin in standard locations
 RUN mkdir -p /root/yt-dlp-plugins/bgutil-ytdlp-pot-provider \
     && cp -r /opt/bgutil-ytdlp-pot-provider/plugin/* /root/yt-dlp-plugins/bgutil-ytdlp-pot-provider/ \

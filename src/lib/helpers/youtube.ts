@@ -78,7 +78,7 @@ export interface DownloadResult {
  */
 export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
-  const extractorArgs = `youtube:player_client=mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
+  const extractorArgs = `youtube:player_client=android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
 
   return {
     noPlaylist: true,
