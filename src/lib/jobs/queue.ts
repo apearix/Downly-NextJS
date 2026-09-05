@@ -97,6 +97,8 @@ class JobQueue {
           preferFreeFormats: true,
           verbose: true,
           ffmpegLocation: ENV.FFMPEG_LOCATION,
+          jsRuntimes: "node",
+          extractorArgs: "youtube:player_client=android,web",
         };
       } else {
         const targetHeight = parseQualityToHeight(job.quality);
@@ -108,6 +110,8 @@ class JobQueue {
           noPlaylist: true,
           verbose: true,
           ffmpegLocation: ENV.FFMPEG_LOCATION,
+          jsRuntimes: "node",
+          extractorArgs: "youtube:player_client=android,web",
         };
       }
 

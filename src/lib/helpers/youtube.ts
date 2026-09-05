@@ -57,6 +57,11 @@ export interface DownloadResult {
   mimeType: string;
 }
 
+type ExtendedFlags = NonNullable<Parameters<typeof youtubedl>[1]> & {
+  jsRuntimes?: string;
+  extractorArgs?: string;
+};
+
 /**
  * Fetch video metadata and list of actually available resolutions for YouTube video
  */
@@ -69,7 +74,9 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       noPlaylist: true,
       skipDownload: true,
       ffmpegLocation: ffmpegLocation || undefined,
-    })) as Record<string, unknown>;
+      jsRuntimes: "node",
+      extractorArgs: "youtube:player_client=android,web",
+    } as ExtendedFlags)) as Record<string, unknown>;
 
     const rawFormats = (Array.isArray(info?.formats) ? info.formats : []) as Record<string, unknown>[];
 
@@ -143,7 +150,9 @@ export async function downloadYouTubeAudio(url: string): Promise<DownloadResult>
       preferFreeFormats: true,
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
-    });
+      jsRuntimes: "node",
+      extractorArgs: "youtube:player_client=android,web",
+    } as ExtendedFlags);
 
     const files = await fs.readdir(tempDir);
     const audioFile = files.find((file) => file.toLowerCase().endsWith(".mp3"));
@@ -211,7 +220,9 @@ export async function downloadYouTubeVideo(
       noPlaylist: true,
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
-    });
+      jsRuntimes: "node",
+      extractorArgs: "youtube:player_client=android,web",
+    } as ExtendedFlags);
 
     const files = await fs.readdir(tempDir);
     const videoFile =
