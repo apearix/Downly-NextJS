@@ -15,10 +15,19 @@ function getFfmpegLocation(): string | undefined {
 export function getCookiesLocation(): string | undefined {
   if (process.env.YOUTUBE_COOKIES) {
     try {
+      let content = process.env.YOUTUBE_COOKIES.trim();
+      // Handle base64 encoded cookies or literal \n in env strings
+      if (content.startsWith("base64:")) {
+        content = Buffer.from(content.slice(7), "base64").toString("utf-8");
+      } else if (!content.includes("\n") && content.includes("\\n")) {
+        content = content.replace(/\\n/g, "\n");
+      }
       const cookiesPath = path.join(os.tmpdir(), "youtube-cookies.txt");
-      fsSync.writeFileSync(cookiesPath, process.env.YOUTUBE_COOKIES, "utf-8");
+      fsSync.writeFileSync(cookiesPath, content, "utf-8");
       return cookiesPath;
-    } catch {}
+    } catch (err) {
+      console.warn("Failed to write YOUTUBE_COOKIES:", err);
+    }
   }
   const localCookies = path.join(process.cwd(), "cookies.txt");
   if (fsSync.existsSync(/*turbopackIgnore: true*/ localCookies)) {
@@ -75,10 +84,17 @@ export interface DownloadResult {
 /**
  * Standard yt-dlp execution options configured for cloud datacenters
  * Uses bgutil PO Token Provider (mweb + BotGuard PO Token on port 4416)
+ * Supports cookies when YOUTUBE_COOKIES is set
  */
 export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
-  const extractorArgs = `youtube:player_client=android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
+  const cookiesPath = getCookiesLocation();
+
+  // If cookies are provided, use standard clients + bgutil PO token for highest quality formats.
+  // If no cookies are provided, fallback through embedded/mobile clients to avoid 403 blocks.
+  const extractorArgs = cookiesPath
+    ? `youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`
+    : `youtube:player_client=web_embedded,android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
 
   return {
     noPlaylist: true,
@@ -88,7 +104,7 @@ export function getYtDlpOptions(): Record<string, unknown> {
     fragmentRetries: 3,
     socketTimeout: 30,
     ffmpegLocation: getFfmpegLocation() || undefined,
-    cookies: getCookiesLocation() || undefined,
+    cookies: cookiesPath || undefined,
     extractorArgs,
   };
 }
