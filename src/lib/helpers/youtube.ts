@@ -72,21 +72,37 @@ export interface DownloadResult {
   mimeType: string;
 }
 
+/**
+ * Standard yt-dlp execution options configured for cloud datacenters
+ * Uses bgutil PO Token Provider (mweb + BotGuard PO Token on port 4416)
+ */
+export function getYtDlpOptions(): Record<string, unknown> {
+  const bgutilPort = process.env.BGUTIL_PORT || "4416";
+  const extractorArgs = `youtube:player_client=mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
+
+  return {
+    noPlaylist: true,
+    jsRuntimes: "deno",
+    forceIpv4: true,
+    retries: 3,
+    fragmentRetries: 3,
+    socketTimeout: 30,
+    ffmpegLocation: getFfmpegLocation() || undefined,
+    cookies: getCookiesLocation() || undefined,
+    extractorArgs,
+  };
+}
 
 /**
  * Fetch video metadata and list of actually available resolutions for YouTube video
  */
 export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
-  const ffmpegLocation = getFfmpegLocation();
-
   try {
     const info = (await youtubedl(url, {
+      ...getYtDlpOptions(),
       dumpSingleJson: true,
-      noPlaylist: true,
       skipDownload: true,
-      ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "deno",
-      cookies: getCookiesLocation() || undefined,
+      verbose: true,
     } as unknown as Parameters<typeof youtubedl>[1])) as Record<string, unknown>;
 
     const rawFormats = (Array.isArray(info?.formats) ? info.formats : []) as Record<string, unknown>[];
@@ -139,23 +155,18 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
 export async function downloadYouTubeAudio(url: string): Promise<DownloadResult> {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "downly-"));
   const outputTemplate = path.join(tempDir, "%(title)s.%(ext)s");
-  const ffmpegLocation = getFfmpegLocation();
 
   try {
     console.log("yt-dlp path:", ytDlpPath);
-    console.log("ffmpeg location:", ffmpegLocation);
 
     await youtubedl(url, {
+      ...getYtDlpOptions(),
       extractAudio: true,
       audioFormat: "mp3",
       audioQuality: 0,
       output: outputTemplate,
-      noPlaylist: true,
       preferFreeFormats: true,
       verbose: true,
-      ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "deno",
-      cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 
     const files = await fs.readdir(tempDir);
@@ -205,7 +216,6 @@ export async function downloadYouTubeVideo(
 ): Promise<DownloadResult> {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "downly-video-"));
   const outputTemplate = path.join(tempDir, "%(title)s.%(ext)s");
-  const ffmpegLocation = getFfmpegLocation();
   const targetHeight = parseQualityToHeight(quality);
 
   // Best MP4 video + M4A audio first for fast stream-copy mux,
@@ -214,18 +224,14 @@ export async function downloadYouTubeVideo(
 
   try {
     console.log("yt-dlp path:", ytDlpPath);
-    console.log("ffmpeg location:", ffmpegLocation);
     console.log("target resolution height:", targetHeight);
 
     await youtubedl(url, {
+      ...getYtDlpOptions(),
       format: formatSelector,
       mergeOutputFormat: "mp4",
       output: outputTemplate,
-      noPlaylist: true,
       verbose: true,
-      ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "deno",
-      cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 
     const files = await fs.readdir(tempDir);

@@ -6,7 +6,7 @@ import os from "node:os";
 import { ENV } from "@/lib/config/env";
 import { jobStore } from "@/lib/jobs/store";
 import { storage } from "@/lib/storage";
-import { parseQualityToHeight, getCookiesLocation } from "@/lib/helpers/youtube";
+import { parseQualityToHeight, getYtDlpOptions } from "@/lib/helpers/youtube";
 import { sanitizeFilename } from "@/lib/security/url";
 
 const youtubedl = create(ENV.YTDLP_PATH);
@@ -87,33 +87,27 @@ class JobQueue {
       const isAudio = job.type === "audio";
       let flags: Record<string, unknown>;
 
+      const commonOpts = getYtDlpOptions();
+
       if (isAudio) {
         flags = {
+          ...commonOpts,
           extractAudio: true,
           audioFormat: "mp3",
           audioQuality: 0,
           output: outputTemplate,
-          noPlaylist: true,
           preferFreeFormats: true,
           verbose: true,
-          ffmpegLocation: ENV.FFMPEG_LOCATION,
-          jsRuntimes: "deno",
-          extractorArgs: "youtube:player_client=android",
-          cookies: getCookiesLocation() || undefined,
         };
       } else {
         const targetHeight = parseQualityToHeight(job.quality);
         const formatSelector = `bestvideo[height<=?${targetHeight}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=?${targetHeight}]+bestaudio/best[height<=?${targetHeight}]/best`;
         flags = {
+          ...commonOpts,
           format: formatSelector,
           mergeOutputFormat: "mp4",
           output: outputTemplate,
-          noPlaylist: true,
           verbose: true,
-          ffmpegLocation: ENV.FFMPEG_LOCATION,
-          jsRuntimes: "deno",
-          extractorArgs: "youtube:player_client=android",
-          cookies: getCookiesLocation() || undefined,
         };
       }
 
