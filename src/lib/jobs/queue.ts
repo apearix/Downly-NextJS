@@ -97,8 +97,8 @@ class JobQueue {
           preferFreeFormats: true,
           verbose: true,
           ffmpegLocation: ENV.FFMPEG_LOCATION,
-          jsRuntimes: "deno,node",
-          extractorArgs: "youtube:player_client=android,web",
+          jsRuntimes: "deno",
+          extractorArgs: "youtube:player_client=android",
           cookies: getCookiesLocation() || undefined,
         };
       } else {
@@ -111,8 +111,8 @@ class JobQueue {
           noPlaylist: true,
           verbose: true,
           ffmpegLocation: ENV.FFMPEG_LOCATION,
-          jsRuntimes: "deno,node",
-          extractorArgs: "youtube:player_client=android,web",
+          jsRuntimes: "deno",
+          extractorArgs: "youtube:player_client=android",
           cookies: getCookiesLocation() || undefined,
         };
       }
