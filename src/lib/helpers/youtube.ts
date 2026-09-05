@@ -106,10 +106,8 @@ export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
   const cookiesPath = getCookiesLocation();
 
-  // Disable script provider to avoid 15s timeout, use running HTTP server
-  const extractorArgs = cookiesPath
-    ? `youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`
-    : `youtube:player_client=web_embedded,android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`;
+  const clientList = "android_vr,android,ios,web_embedded,mweb";
+  const extractorArgs = `youtube:player_client=${clientList};youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`;
 
   return {
     noPlaylist: true,
