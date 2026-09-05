@@ -37,10 +37,14 @@ export async function GET(request: NextRequest) {
 
     const info = await getYouTubeInfo(validation.normalizedUrl);
     return NextResponse.json({ success: true, ...info }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
     console.error("Info route error:", error);
     return NextResponse.json(
-      { error: "Unable to retrieve information for this YouTube video." },
+      {
+        error: "Unable to retrieve information for this YouTube video.",
+        details: err?.message || "Internal server error",
+      },
       { status: 500 }
     );
   }
@@ -78,10 +82,14 @@ export async function POST(request: NextRequest) {
 
     const info = await getYouTubeInfo(validation.normalizedUrl);
     return NextResponse.json({ success: true, ...info }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
     console.error("Info route error:", error);
     return NextResponse.json(
-      { error: "Unable to retrieve information for this YouTube video." },
+      {
+        error: "Unable to retrieve information for this YouTube video.",
+        details: err?.message || "Internal server error",
+      },
       { status: 500 }
     );
   }

@@ -125,7 +125,7 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
     const err = error as { stderr?: string; message?: string };
     console.error("YT-DLP INFO ERROR:");
     console.error(err?.stderr || err?.message || error);
-    throw new Error("Unable to retrieve information for this YouTube video.");
+    throw new Error(err?.stderr || err?.message || "Unable to retrieve information for this YouTube video.");
   }
 }
 
