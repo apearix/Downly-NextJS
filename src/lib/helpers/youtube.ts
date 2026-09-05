@@ -13,6 +13,22 @@ function getFfmpegLocation(): string | undefined {
 }
 
 export function getCookiesLocation(): string | undefined {
+  const tmpCookiesPath = path.join(os.tmpdir(), "youtube-cookies.txt");
+
+  // Render Secret File location (/etc/secrets/cookies.txt is read-only).
+  // We MUST copy it to writable /tmp so yt-dlp's save_cookies does not crash with:
+  // OSError: [Errno 30] Read-only file system
+  const renderSecret = "/etc/secrets/cookies.txt";
+  if (fsSync.existsSync(/*turbopackIgnore: true*/ renderSecret)) {
+    try {
+      fsSync.copyFileSync(renderSecret, tmpCookiesPath);
+      return tmpCookiesPath;
+    } catch (err) {
+      console.warn("Failed to copy renderSecret to tmp:", err);
+      return renderSecret;
+    }
+  }
+
   if (process.env.YOUTUBE_COOKIES) {
     try {
       let content = process.env.YOUTUBE_COOKIES.trim();
@@ -22,19 +38,13 @@ export function getCookiesLocation(): string | undefined {
       } else if (!content.includes("\n") && content.includes("\\n")) {
         content = content.replace(/\\n/g, "\n");
       }
-      const cookiesPath = path.join(os.tmpdir(), "youtube-cookies.txt");
-      fsSync.writeFileSync(cookiesPath, content, "utf-8");
-      return cookiesPath;
+      fsSync.writeFileSync(tmpCookiesPath, content, "utf-8");
+      return tmpCookiesPath;
     } catch (err) {
       console.warn("Failed to write YOUTUBE_COOKIES:", err);
     }
   }
 
-  // Render Secret File location
-  const renderSecret = "/etc/secrets/cookies.txt";
-  if (fsSync.existsSync(/*turbopackIgnore: true*/ renderSecret)) {
-    return renderSecret;
-  }
   const localCookies = path.join(process.cwd(), "cookies.txt");
   if (fsSync.existsSync(/*turbopackIgnore: true*/ localCookies)) {
     return localCookies;
@@ -90,17 +100,16 @@ export interface DownloadResult {
 /**
  * Standard yt-dlp execution options configured for cloud datacenters
  * Uses bgutil PO Token Provider (mweb + BotGuard PO Token on port 4416)
- * Supports cookies when YOUTUBE_COOKIES is set
+ * Supports cookies when YOUTUBE_COOKIES or /etc/secrets/cookies.txt is set
  */
 export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
   const cookiesPath = getCookiesLocation();
 
-  // If cookies are provided, use standard clients + bgutil PO token for highest quality formats.
-  // If no cookies are provided, fallback through embedded/mobile clients to avoid 403 blocks.
+  // Disable script provider to avoid 15s timeout, use running HTTP server
   const extractorArgs = cookiesPath
-    ? `youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`
-    : `youtube:player_client=web_embedded,android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort}`;
+    ? `youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`
+    : `youtube:player_client=web_embedded,android_vr,android,ios,mweb;youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`;
 
   return {
     noPlaylist: true,

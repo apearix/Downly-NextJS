@@ -33,14 +33,12 @@ RUN git clone --depth 1 --branch 1.3.2 https://github.com/Brainicism/bgutil-ytdl
 WORKDIR /opt/bgutil-ytdlp-pot-provider/server
 RUN npm ci && npx tsc
 
-# Symlink to /root so script-node and script-deno providers find generate_once scripts
-RUN ln -s /opt/bgutil-ytdlp-pot-provider /root/bgutil-ytdlp-pot-provider
-
-# Install bgutil yt-dlp plugin in standard locations
+# Install only the fast HTTP provider plugin (remove slow script provider that causes timeouts)
 RUN mkdir -p /root/yt-dlp-plugins/bgutil-ytdlp-pot-provider \
     && cp -r /opt/bgutil-ytdlp-pot-provider/plugin/* /root/yt-dlp-plugins/bgutil-ytdlp-pot-provider/ \
     && mkdir -p /etc/yt-dlp/plugins/bgutil-ytdlp-pot-provider \
-    && cp -r /opt/bgutil-ytdlp-pot-provider/plugin/* /etc/yt-dlp/plugins/bgutil-ytdlp-pot-provider/
+    && cp -r /opt/bgutil-ytdlp-pot-provider/plugin/* /etc/yt-dlp/plugins/bgutil-ytdlp-pot-provider/ \
+    && find /root/yt-dlp-plugins /etc/yt-dlp/plugins -name "*script*.py" -delete
 
 # Configure plugin directories for yt-dlp
 RUN mkdir -p /root/.config/yt-dlp \
