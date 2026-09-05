@@ -18,6 +18,7 @@ import {
   User as UserIcon
 } from "lucide-react";
 import type { JobPublicDto } from "@/lib/types/job";
+import { getApiBaseUrl } from "@/lib/config/api";
 
 type MediaType = "video" | "audio";
 
@@ -89,8 +90,8 @@ export function DownloadBox() {
 
   const detectedPlatform = getPlatform(url);
 
-  // Dynamic API base for hybrid Vercel + Render/VPS deployment
-  const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  // Dynamic API base: supports local testing, Render direct, or Vercel proxy
+  const apiBase = getApiBaseUrl();
 
   // Clear polling timer on unmount
   useEffect(() => {
@@ -105,12 +106,20 @@ export function DownloadBox() {
   const startPollingJob = useCallback((jobId: string) => {
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
 
+    let consecutiveErrors = 0;
+
     pollTimerRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/jobs/${jobId}`);
+        const res = await fetch(`${apiBase}/api/jobs/${jobId}`);
         if (!res.ok) {
-          throw new Error("Unable to check download progress.");
+          consecutiveErrors++;
+          if (consecutiveErrors >= 5) {
+            throw new Error("Unable to check download progress.");
+          }
+          return;
         }
+
+        consecutiveErrors = 0;
         const data = await res.json();
         const job: JobPublicDto = data.job;
         setActiveJob(job);
@@ -121,15 +130,21 @@ export function DownloadBox() {
 
           // Automatically trigger file download
           if (job.downloadUrl) {
-            const link = document.createElement("a");
             const downloadHref = job.downloadUrl.startsWith("http")
               ? job.downloadUrl
-              : `${API_BASE}${job.downloadUrl}`;
-            link.href = downloadHref;
-            link.download = job.filename || "downly-media";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+              : `${apiBase}${job.downloadUrl}`;
+            try {
+              const link = document.createElement("a");
+              link.href = downloadHref;
+              link.download = job.filename || "downly-media";
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+            } catch (clickErr) {
+              console.warn("Auto-download click prevented, user can click button directly:", clickErr);
+            }
           }
         } else if (job.status === "failed") {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
@@ -143,8 +158,8 @@ export function DownloadBox() {
       } catch (err) {
         console.error("Polling error:", err);
       }
-    }, 800);
-  }, [API_BASE]);
+    }, 1200);
+  }, [apiBase]);
 
   // Debounced URL metadata analysis
   useEffect(() => {
@@ -162,7 +177,7 @@ export function DownloadBox() {
       setErrorMsg(null);
 
       try {
-        const res = await fetch(`${API_BASE}/api/info?url=${encodeURIComponent(trimmed)}`, {
+        const res = await fetch(`${apiBase}/api/info?url=${encodeURIComponent(trimmed)}`, {
           signal: controller.signal,
         });
 
@@ -182,11 +197,14 @@ export function DownloadBox() {
           });
 
           // Ensure selected quality is available or fallback to best
-          const hasCurrent = data.qualities.some((q: QualityOption) => q.id === quality);
-          if (!hasCurrent) {
-            const highest = [...data.qualities].sort((a: QualityOption, b: QualityOption) => b.height - a.height)[0];
-            if (highest) setQuality(highest.id);
-          }
+          setQuality((prev) => {
+            const hasCurrent = data.qualities.some((q: QualityOption) => q.id === prev);
+            if (!hasCurrent) {
+              const highest = [...data.qualities].sort((a: QualityOption, b: QualityOption) => b.height - a.height)[0];
+              return highest ? highest.id : prev;
+            }
+            return prev;
+          });
         }
       } catch (err: unknown) {
         const error = err as { name?: string; message?: string };
@@ -196,13 +214,13 @@ export function DownloadBox() {
       } finally {
         setIsAnalyzing(false);
       }
-    }, 500);
+    }, 600);
 
     return () => {
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [url, quality, API_BASE]);
+  }, [url, apiBase]);
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextVal = e.target.value;
@@ -242,8 +260,9 @@ export function DownloadBox() {
 
   const handleCancelJob = async () => {
     if (!activeJob?.id) return;
+    const currentBase = apiBase || getApiBaseUrl();
     try {
-      await fetch(`${API_BASE}/api/jobs/${activeJob.id}`, { method: "DELETE" });
+      await fetch(`${currentBase}/api/jobs/${activeJob.id}`, { method: "DELETE" });
     } catch {}
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     setActiveJob(null);
@@ -257,9 +276,10 @@ export function DownloadBox() {
 
     setIsSubmitting(true);
     setErrorMsg(null);
+    const currentBase = apiBase || getApiBaseUrl();
 
     try {
-      const response = await fetch(`${API_BASE}/api/jobs`, {
+      const response = await fetch(`${currentBase}/api/jobs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -469,6 +489,34 @@ export function DownloadBox() {
                 {activeJob.progress.eta && <span>ETA {activeJob.progress.eta}</span>}
               </div>
             </div>
+
+            {/* Direct manual download button if completed */}
+            {activeJob.status === "completed" && activeJob.downloadUrl && (
+              <div className="mt-3 pt-3 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                <div className="text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>
+                    {activeJob.fileSize
+                      ? `${(activeJob.fileSize / (1024 * 1024)).toFixed(1)} MB · Ready to save`
+                      : "File ready for download"}
+                  </span>
+                </div>
+                <a
+                  href={
+                    activeJob.downloadUrl.startsWith("http")
+                      ? activeJob.downloadUrl
+                      : `${apiBase || getApiBaseUrl()}${activeJob.downloadUrl}`
+                  }
+                  download={activeJob.filename || "downly-media"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 px-4 py-2 text-xs font-bold text-white shadow-sm transition"
+                >
+                  <ArrowDown className="h-3.5 w-3.5 stroke-[3]" />
+                  <span>Save Media File</span>
+                </a>
+              </div>
+            )}
           </div>
         )}
 
@@ -478,9 +526,11 @@ export function DownloadBox() {
             <div className="flex h-16 w-24 shrink-0 animate-pulse items-center justify-center rounded-xl bg-black/5">
               <Loader2 className="h-5 w-5 animate-spin text-[#74da03]" />
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-1.5">
               <div className="h-4 w-3/4 animate-pulse rounded-md bg-black/5" />
-              <div className="h-3 w-1/3 animate-pulse rounded-md bg-black/5" />
+              <p className="text-[11px] font-medium text-[#738079]">
+                Fetching video stream details...
+              </p>
             </div>
           </div>
         ) : mediaInfo && (

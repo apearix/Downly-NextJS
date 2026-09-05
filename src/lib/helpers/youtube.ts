@@ -86,8 +86,7 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       skipDownload: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno,node",
-      remoteComponents: "ejs:github",
-      extractorArgs: "youtube:player_client=android,ios,mweb,web",
+      extractorArgs: "youtube:player_client=android,web",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1])) as Record<string, unknown>;
 
@@ -164,8 +163,7 @@ export async function downloadYouTubeAudio(url: string): Promise<DownloadResult>
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno,node",
-      remoteComponents: "ejs:github",
-      extractorArgs: "youtube:player_client=android,ios,mweb,web",
+      extractorArgs: "youtube:player_client=android,web",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 
@@ -236,8 +234,7 @@ export async function downloadYouTubeVideo(
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno,node",
-      remoteComponents: "ejs:github",
-      extractorArgs: "youtube:player_client=android,ios,mweb,web",
+      extractorArgs: "youtube:player_client=android,web",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 

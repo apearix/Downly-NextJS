@@ -1,9 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { jobStore } from "@/lib/jobs/store";
 import { downloadQueue } from "@/lib/jobs/queue";
 import { toPublicJobDto } from "@/lib/types/job";
+import { handleOptions, jsonWithCors } from "@/lib/api/cors";
 
 export const runtime = "nodejs";
+
+export async function OPTIONS() {
+  return handleOptions();
+}
 
 export async function GET(
   _request: NextRequest,
@@ -13,7 +18,7 @@ export async function GET(
     const { id } = await context.params;
 
     if (!id) {
-      return NextResponse.json(
+      return jsonWithCors(
         { error: "Invalid job identifier." },
         { status: 400 }
       );
@@ -21,13 +26,13 @@ export async function GET(
 
     const job = await jobStore.getJob(id);
     if (!job) {
-      return NextResponse.json(
+      return jsonWithCors(
         { error: "Job not found or expired." },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(
+    return jsonWithCors(
       {
         success: true,
         job: toPublicJobDto(job),
@@ -36,7 +41,7 @@ export async function GET(
     );
   } catch (error) {
     console.error("Failed to retrieve job status:", error);
-    return NextResponse.json(
+    return jsonWithCors(
       { error: "Unable to retrieve job status." },
       { status: 500 }
     );
@@ -51,7 +56,7 @@ export async function DELETE(
     const { id } = await context.params;
 
     if (!id) {
-      return NextResponse.json(
+      return jsonWithCors(
         { error: "Invalid job identifier." },
         { status: 400 }
       );
@@ -59,7 +64,7 @@ export async function DELETE(
 
     const cancelled = await downloadQueue.cancel(id);
 
-    return NextResponse.json(
+    return jsonWithCors(
       {
         success: true,
         message: cancelled
@@ -70,7 +75,7 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Failed to cancel job:", error);
-    return NextResponse.json(
+    return jsonWithCors(
       { error: "Unable to cancel job." },
       { status: 500 }
     );

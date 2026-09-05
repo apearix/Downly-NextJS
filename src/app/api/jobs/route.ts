@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import crypto from "node:crypto";
 import { ENV } from "@/lib/config/env";
 import { validateMediaUrl } from "@/lib/security/url";
@@ -6,14 +6,19 @@ import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 import { jobStore } from "@/lib/jobs/store";
 import { downloadQueue } from "@/lib/jobs/queue";
 import { DownloadJob, toPublicJobDto } from "@/lib/types/job";
+import { handleOptions, jsonWithCors } from "@/lib/api/cors";
 
 export const runtime = "nodejs";
+
+export async function OPTIONS() {
+  return handleOptions();
+}
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request.headers);
   const rate = checkRateLimit(ip);
   if (!rate.success) {
-    return NextResponse.json(
+    return jsonWithCors(
       { error: "Too many requests. Please slow down and try again." },
       {
         status: 429,
@@ -35,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const validation = validateMediaUrl(rawUrl);
     if (!validation.isValid || !validation.normalizedUrl) {
-      return NextResponse.json(
+      return jsonWithCors(
         { error: validation.error || "Please enter a valid YouTube URL." },
         { status: 400 }
       );
@@ -65,7 +70,7 @@ export async function POST(request: NextRequest) {
       console.error(`Failed to enqueue job ${jobId}:`, err);
     });
 
-    return NextResponse.json(
+    return jsonWithCors(
       {
         success: true,
         jobId,
@@ -75,7 +80,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Failed to create job:", error);
-    return NextResponse.json(
+    return jsonWithCors(
       {
         error: "Unable to create download job. Please try again.",
         details: error instanceof Error ? error.message : String(error),

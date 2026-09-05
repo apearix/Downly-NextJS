@@ -89,9 +89,9 @@ export const ENV = {
     10
   ), // 1 minute
   RATE_LIMIT_MAX_REQUESTS: parseInt(
-    process.env.RATE_LIMIT_MAX_REQUESTS || "20",
+    process.env.RATE_LIMIT_MAX_REQUESTS || "120",
     10
-  ), // 20 requests/minute
+  ), // 120 requests/minute to safely allow status polling
 
   // Redis
   REDIS_URL: process.env.REDIS_URL || "",
