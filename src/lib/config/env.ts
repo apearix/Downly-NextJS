@@ -39,16 +39,34 @@ export const ENV = {
     ) {
       return WIN_DEFAULT_FFMPEG_PATH;
     }
+    if (fsSync.existsSync(/*turbopackIgnore: true*/ "/usr/bin/ffmpeg")) {
+      return "/usr/bin";
+    }
     return undefined;
   })(),
 
   YTDLP_PATH: (() => {
-    if (process.env.YTDLP_PATH) return process.env.YTDLP_PATH;
+    if (process.env.YTDLP_PATH && fsSync.existsSync(process.env.YTDLP_PATH)) {
+      return process.env.YTDLP_PATH;
+    }
     if (
       process.platform === "win32" &&
       fsSync.existsSync(/*turbopackIgnore: true*/ WIN_DEFAULT_YTDLP_PATH)
     ) {
       return WIN_DEFAULT_YTDLP_PATH;
+    }
+    if (fsSync.existsSync(/*turbopackIgnore: true*/ "/usr/local/bin/yt-dlp")) {
+      return "/usr/local/bin/yt-dlp";
+    }
+    const moduleLinuxYtdlp = path.join(
+      process.cwd(),
+      "node_modules",
+      "youtube-dl-exec",
+      "bin",
+      "yt-dlp"
+    );
+    if (fsSync.existsSync(/*turbopackIgnore: true*/ moduleLinuxYtdlp)) {
+      return moduleLinuxYtdlp;
     }
     return "yt-dlp";
   })(),

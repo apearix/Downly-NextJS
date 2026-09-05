@@ -3,42 +3,13 @@ import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { ENV } from "@/lib/config/env";
 
-const ytDlpPath = path.join(
-  process.cwd(),
-  "node_modules",
-  "youtube-dl-exec",
-  "bin",
-  "yt-dlp.exe"
-);
-
+const ytDlpPath = ENV.YTDLP_PATH;
 const youtubedl = create(ytDlpPath);
 
-const DEFAULT_FFMPEG_PATH =
-  "C:\\Users\\Dharmendra\\AppData\\Local\\Microsoft\\WinGet\\Packages\\yt-dlp.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-N-125875-g5d4d3bdc61-win64-gpl\\bin";
-const DEFAULT_DENO_PATH =
-  "C:\\Users\\Dharmendra\\AppData\\Local\\Microsoft\\WinGet\\Packages\\DenoLand.Deno_Microsoft.Winget.Source_8wekyb3d8bbwe";
-const DEFAULT_PYTHON_PATH =
-  "C:\\Users\\Dharmendra\\AppData\\Local\\Programs\\Python\\Python313";
-
-// Ensure PATH contains Deno and Python if running on Windows
-if (process.platform === "win32") {
-  const currentPath = process.env.PATH || "";
-  const extraPaths = [DEFAULT_DENO_PATH, DEFAULT_PYTHON_PATH].filter(
-    (p) => !currentPath.includes(p) && fsSync.existsSync(/*turbopackIgnore: true*/ p)
-  );
-  if (extraPaths.length > 0) {
-    process.env.PATH = `${extraPaths.join(";")};${currentPath}`;
-  }
-}
-
 function getFfmpegLocation(): string | undefined {
-  return (
-    process.env.FFMPEG_PATH ||
-    (fsSync.existsSync(/*turbopackIgnore: true*/ DEFAULT_FFMPEG_PATH)
-      ? DEFAULT_FFMPEG_PATH
-      : undefined)
-  );
+  return ENV.FFMPEG_LOCATION;
 }
 
 export const STANDARD_RESOLUTIONS: { height: number; id: string; label: string }[] = [
