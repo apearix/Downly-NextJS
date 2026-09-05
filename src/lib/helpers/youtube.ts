@@ -86,7 +86,6 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       skipDownload: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno",
-      extractorArgs: "youtube:player_client=android",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1])) as Record<string, unknown>;
 
@@ -111,15 +110,8 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       heightsArray.some((h) => Math.abs(h - res.height) <= 12)
     );
 
-    // If no match found (fallback), provide at least 720p or 1080p
-    const qualities =
-      matchedQualities.length > 0
-        ? matchedQualities
-        : [
-            { height: 360, id: "360p", label: "360p" },
-            { height: 720, id: "720p", label: "720p HD" },
-            { height: 1080, id: "1080p", label: "1080p FHD" },
-          ];
+    // If no match found 
+    const qualities = matchedQualities;
 
     return {
       title: typeof info.title === "string" ? info.title : "YouTube Media",
@@ -163,7 +155,6 @@ export async function downloadYouTubeAudio(url: string): Promise<DownloadResult>
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno",
-      extractorArgs: "youtube:player_client=android",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 
@@ -234,7 +225,6 @@ export async function downloadYouTubeVideo(
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "deno",
-      extractorArgs: "youtube:player_client=android",
       cookies: getCookiesLocation() || undefined,
     } as unknown as Parameters<typeof youtubedl>[1]);
 
