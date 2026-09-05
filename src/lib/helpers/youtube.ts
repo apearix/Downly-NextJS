@@ -106,16 +106,16 @@ export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
   const cookiesPath = getCookiesLocation();
 
-  // Desktop cookies from Chrome ONLY work with the desktop 'web' client!
-  // Android / iOS clients do not support cookies and get skipped.
+  // When cookies are present, mweb avoids desktop SABR streaming restrictions,
+  // followed by web and default as fallbacks.
   const clientList = cookiesPath
-    ? "web,default"
+    ? "mweb,web,default"
     : "android_vr,android,ios,web_embedded,mweb";
   const extractorArgs = `youtube:player_client=${clientList};youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`;
 
   return {
     noPlaylist: true,
-    jsRuntimes: "deno",
+    jsRuntimes: "deno,node",
     forceIpv4: true,
     retries: 3,
     fragmentRetries: 3,

@@ -48,5 +48,4 @@ echo "Starting Downly Next.js on port 10000 (220MB limit)..."
 echo "=========================================="
 cd /app
 export NODE_OPTIONS="--max-old-space-size=220"
-export DENO_V8_FLAGS="--max-old-space-size=96"
 exec npx next start -p 10000
