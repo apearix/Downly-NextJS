@@ -12,6 +12,21 @@ function getFfmpegLocation(): string | undefined {
   return ENV.FFMPEG_LOCATION;
 }
 
+export function getCookiesLocation(): string | undefined {
+  if (process.env.YOUTUBE_COOKIES) {
+    try {
+      const cookiesPath = path.join(os.tmpdir(), "youtube-cookies.txt");
+      fsSync.writeFileSync(cookiesPath, process.env.YOUTUBE_COOKIES, "utf-8");
+      return cookiesPath;
+    } catch {}
+  }
+  const localCookies = path.join(process.cwd(), "cookies.txt");
+  if (fsSync.existsSync(/*turbopackIgnore: true*/ localCookies)) {
+    return localCookies;
+  }
+  return undefined;
+}
+
 export const STANDARD_RESOLUTIONS: { height: number; id: string; label: string }[] = [
   { height: 144, id: "144p", label: "144p" },
   { height: 240, id: "240p", label: "240p" },
@@ -60,6 +75,7 @@ export interface DownloadResult {
 type ExtendedFlags = NonNullable<Parameters<typeof youtubedl>[1]> & {
   jsRuntimes?: string;
   extractorArgs?: string;
+  cookies?: string;
 };
 
 /**
@@ -76,6 +92,7 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "node",
       extractorArgs: "youtube:player_client=android,web",
+      cookies: getCookiesLocation() || undefined,
     } as ExtendedFlags)) as Record<string, unknown>;
 
     const rawFormats = (Array.isArray(info?.formats) ? info.formats : []) as Record<string, unknown>[];
@@ -152,6 +169,7 @@ export async function downloadYouTubeAudio(url: string): Promise<DownloadResult>
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "node",
       extractorArgs: "youtube:player_client=android,web",
+      cookies: getCookiesLocation() || undefined,
     } as ExtendedFlags);
 
     const files = await fs.readdir(tempDir);
@@ -222,6 +240,7 @@ export async function downloadYouTubeVideo(
       ffmpegLocation: ffmpegLocation || undefined,
       jsRuntimes: "node",
       extractorArgs: "youtube:player_client=android,web",
+      cookies: getCookiesLocation() || undefined,
     } as ExtendedFlags);
 
     const files = await fs.readdir(tempDir);

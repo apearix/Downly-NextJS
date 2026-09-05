@@ -6,7 +6,7 @@ import os from "node:os";
 import { ENV } from "@/lib/config/env";
 import { jobStore } from "@/lib/jobs/store";
 import { storage } from "@/lib/storage";
-import { parseQualityToHeight } from "@/lib/helpers/youtube";
+import { parseQualityToHeight, getCookiesLocation } from "@/lib/helpers/youtube";
 import { sanitizeFilename } from "@/lib/security/url";
 
 const youtubedl = create(ENV.YTDLP_PATH);
@@ -99,6 +99,7 @@ class JobQueue {
           ffmpegLocation: ENV.FFMPEG_LOCATION,
           jsRuntimes: "node",
           extractorArgs: "youtube:player_client=android,web",
+          cookies: getCookiesLocation() || undefined,
         };
       } else {
         const targetHeight = parseQualityToHeight(job.quality);
@@ -112,6 +113,7 @@ class JobQueue {
           ffmpegLocation: ENV.FFMPEG_LOCATION,
           jsRuntimes: "node",
           extractorArgs: "youtube:player_client=android,web",
+          cookies: getCookiesLocation() || undefined,
         };
       }
 
