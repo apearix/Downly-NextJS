@@ -76,7 +76,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Failed to create job:", error);
     return NextResponse.json(
-      { error: "Unable to create download job. Please try again." },
+      {
+        error: "Unable to create download job. Please try again.",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
