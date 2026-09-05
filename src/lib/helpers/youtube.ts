@@ -29,6 +29,12 @@ export function getCookiesLocation(): string | undefined {
       console.warn("Failed to write YOUTUBE_COOKIES:", err);
     }
   }
+
+  // Render Secret File location
+  const renderSecret = "/etc/secrets/cookies.txt";
+  if (fsSync.existsSync(/*turbopackIgnore: true*/ renderSecret)) {
+    return renderSecret;
+  }
   const localCookies = path.join(process.cwd(), "cookies.txt");
   if (fsSync.existsSync(/*turbopackIgnore: true*/ localCookies)) {
     return localCookies;
