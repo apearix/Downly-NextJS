@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { FAQ_ITEMS } from "@/lib/seo/schema";
-import { ChevronDown, MessageSquareCheck, Sparkles } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 export function FAQ() {

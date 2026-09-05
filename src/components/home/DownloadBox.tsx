@@ -89,6 +89,9 @@ export function DownloadBox() {
 
   const detectedPlatform = getPlatform(url);
 
+  // Dynamic API base for hybrid Vercel + Render/VPS deployment
+  const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+
   // Clear polling timer on unmount
   useEffect(() => {
     return () => {
@@ -104,7 +107,7 @@ export function DownloadBox() {
 
     pollTimerRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/jobs/${jobId}`);
+        const res = await fetch(`${API_BASE}/api/jobs/${jobId}`);
         if (!res.ok) {
           throw new Error("Unable to check download progress.");
         }
@@ -119,7 +122,10 @@ export function DownloadBox() {
           // Automatically trigger file download
           if (job.downloadUrl) {
             const link = document.createElement("a");
-            link.href = job.downloadUrl;
+            const downloadHref = job.downloadUrl.startsWith("http")
+              ? job.downloadUrl
+              : `${API_BASE}${job.downloadUrl}`;
+            link.href = downloadHref;
             link.download = job.filename || "downly-media";
             document.body.appendChild(link);
             link.click();
@@ -138,7 +144,7 @@ export function DownloadBox() {
         console.error("Polling error:", err);
       }
     }, 800);
-  }, []);
+  }, [API_BASE]);
 
   // Debounced URL metadata analysis
   useEffect(() => {
@@ -156,7 +162,7 @@ export function DownloadBox() {
       setErrorMsg(null);
 
       try {
-        const res = await fetch(`/api/info?url=${encodeURIComponent(trimmed)}`, {
+        const res = await fetch(`${API_BASE}/api/info?url=${encodeURIComponent(trimmed)}`, {
           signal: controller.signal,
         });
 
@@ -196,7 +202,7 @@ export function DownloadBox() {
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [url, quality]);
+  }, [url, quality, API_BASE]);
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextVal = e.target.value;
@@ -237,7 +243,7 @@ export function DownloadBox() {
   const handleCancelJob = async () => {
     if (!activeJob?.id) return;
     try {
-      await fetch(`/api/jobs/${activeJob.id}`, { method: "DELETE" });
+      await fetch(`${API_BASE}/api/jobs/${activeJob.id}`, { method: "DELETE" });
     } catch {}
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     setActiveJob(null);
@@ -253,7 +259,7 @@ export function DownloadBox() {
     setErrorMsg(null);
 
     try {
-      const response = await fetch("/api/jobs", {
+      const response = await fetch(`${API_BASE}/api/jobs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
