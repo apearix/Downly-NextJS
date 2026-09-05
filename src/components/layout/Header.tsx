@@ -8,7 +8,7 @@ import { ArrowRight, Menu, X, ChevronRight } from "lucide-react";
 const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Features", href: "#features" },
-  { name: "How it works", href: "#how-it-works" },
+  { name: "FAQ", href: "#faq" },
 ];
 
 export function Header() {
