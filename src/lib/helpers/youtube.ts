@@ -106,7 +106,11 @@ export function getYtDlpOptions(): Record<string, unknown> {
   const bgutilPort = process.env.BGUTIL_PORT || "4416";
   const cookiesPath = getCookiesLocation();
 
-  const clientList = "android_vr,android,ios,web_embedded,mweb";
+  // Desktop cookies from Chrome ONLY work with the desktop 'web' client!
+  // Android / iOS clients do not support cookies and get skipped.
+  const clientList = cookiesPath
+    ? "web,default"
+    : "android_vr,android,ios,web_embedded,mweb";
   const extractorArgs = `youtube:player_client=${clientList};youtubepot-bgutilhttp:base_url=http://127.0.0.1:${bgutilPort};youtubepot-bgutilscript:disabled=true`;
 
   return {
