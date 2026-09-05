@@ -15,11 +15,11 @@ echo "FFmpeg version:"
 ffmpeg -version | head -n 1 || true
 
 echo "=========================================="
-echo "Starting bgutil PO Token provider..."
+echo "Starting bgutil PO Token provider (128MB limit)..."
 echo "=========================================="
 
 cd /opt/bgutil-ytdlp-pot-provider/server
-node build/main.js --port 4416 &
+node --max-old-space-size=128 build/main.js --port 4416 &
 BGUTIL_PID=$!
 echo "bgutil PID: $BGUTIL_PID"
 
@@ -44,7 +44,9 @@ if ! curl -fsS http://127.0.0.1:4416/ping >/dev/null 2>&1; then
 fi
 
 echo "=========================================="
-echo "Starting Downly Next.js on port 10000..."
+echo "Starting Downly Next.js on port 10000 (220MB limit)..."
 echo "=========================================="
 cd /app
-exec npm start -- -p 10000
+export NODE_OPTIONS="--max-old-space-size=220"
+export DENO_V8_FLAGS="--max-old-space-size=96"
+exec npx next start -p 10000

@@ -52,6 +52,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=10000
 ENV BGUTIL_PORT=4416
+ENV NODE_OPTIONS="--max-old-space-size=220"
+ENV DENO_V8_FLAGS="--max-old-space-size=96"
 ENV FFMPEG_PATH=/usr/bin
 ENV FFMPEG_LOCATION=/usr/bin
 ENV YTDLP_PATH=/usr/local/bin/yt-dlp
