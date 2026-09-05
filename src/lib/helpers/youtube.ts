@@ -72,11 +72,6 @@ export interface DownloadResult {
   mimeType: string;
 }
 
-type ExtendedFlags = NonNullable<Parameters<typeof youtubedl>[1]> & {
-  jsRuntimes?: string;
-  extractorArgs?: string;
-  cookies?: string;
-};
 
 /**
  * Fetch video metadata and list of actually available resolutions for YouTube video
@@ -90,10 +85,11 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeMediaInfo> {
       noPlaylist: true,
       skipDownload: true,
       ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "node",
-      extractorArgs: "youtube:player_client=android,web",
+      jsRuntimes: "deno,node",
+      remoteComponents: "ejs:github",
+      extractorArgs: "youtube:player_client=android,ios,mweb,web",
       cookies: getCookiesLocation() || undefined,
-    } as ExtendedFlags)) as Record<string, unknown>;
+    } as unknown as Parameters<typeof youtubedl>[1])) as Record<string, unknown>;
 
     const rawFormats = (Array.isArray(info?.formats) ? info.formats : []) as Record<string, unknown>[];
 
@@ -167,10 +163,11 @@ export async function downloadYouTubeAudio(url: string): Promise<DownloadResult>
       preferFreeFormats: true,
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "node",
-      extractorArgs: "youtube:player_client=android,web",
+      jsRuntimes: "deno,node",
+      remoteComponents: "ejs:github",
+      extractorArgs: "youtube:player_client=android,ios,mweb,web",
       cookies: getCookiesLocation() || undefined,
-    } as ExtendedFlags);
+    } as unknown as Parameters<typeof youtubedl>[1]);
 
     const files = await fs.readdir(tempDir);
     const audioFile = files.find((file) => file.toLowerCase().endsWith(".mp3"));
@@ -238,10 +235,11 @@ export async function downloadYouTubeVideo(
       noPlaylist: true,
       verbose: true,
       ffmpegLocation: ffmpegLocation || undefined,
-      jsRuntimes: "node",
-      extractorArgs: "youtube:player_client=android,web",
+      jsRuntimes: "deno,node",
+      remoteComponents: "ejs:github",
+      extractorArgs: "youtube:player_client=android,ios,mweb,web",
       cookies: getCookiesLocation() || undefined,
-    } as ExtendedFlags);
+    } as unknown as Parameters<typeof youtubedl>[1]);
 
     const files = await fs.readdir(tempDir);
     const videoFile =

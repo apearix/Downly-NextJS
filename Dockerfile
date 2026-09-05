@@ -1,18 +1,25 @@
 # Production Dockerfile for Render.com Web Service
 # Includes Node.js, Python3, FFmpeg, and yt-dlp
 
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
-# Install system dependencies: FFmpeg, Python3, and curl for yt-dlp
+# Install system dependencies: FFmpeg, Python3, unzip, curl, and certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     python3 \
     ca-certificates \
     curl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install latest yt-dlp binary
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+# Install Deno (officially recommended JS runtime for yt-dlp YouTube signature challenges)
+RUN curl -fsSL https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -o /tmp/deno.zip \
+    && unzip /tmp/deno.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/deno \
+    && rm /tmp/deno.zip
+
+# Install official yt-dlp_linux PyInstaller binary (bundles yt-dlp-ejs scripts)
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp \
     && chmod a+rx /usr/local/bin/yt-dlp
 
 WORKDIR /app
