@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Google_Sans_Flex, Inter } from "next/font/google";
 import { SITE_URL } from "@/lib/seo/schema";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const googleSansFlex = Google_Sans_Flex({
@@ -113,6 +114,7 @@ export default function RootLayout({
       </head>
       <body className={`${googleSansFlex.variable} ${inter.variable}`}>
         {children}
+        <Toaster position="top-right" />
       </body>
     </html>
   );

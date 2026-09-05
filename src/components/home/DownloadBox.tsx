@@ -15,10 +15,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  User as UserIcon
+  User as UserIcon,
 } from "lucide-react";
 import type { JobPublicDto } from "@/lib/types/job";
 import { getApiBaseUrl } from "@/lib/config/api";
+import { toast } from "@/components/ui/sonner";
 
 type MediaType = "video" | "audio";
 
@@ -127,6 +128,9 @@ export function DownloadBox() {
         if (job.status === "completed") {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           setIsSubmitting(false);
+          toast.success("Download Ready!", {
+            description: job.filename ? `Downloaded: ${job.filename}` : "Your file is ready to save.",
+          });
 
           // Automatically trigger file download
           if (job.downloadUrl) {
@@ -149,11 +153,14 @@ export function DownloadBox() {
         } else if (job.status === "failed") {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           setIsSubmitting(false);
-          setErrorMsg(job.error || "Download failed. Please try again.");
+          const failMsg = job.error || "Download failed. Please try again.";
+          setErrorMsg(failMsg);
+          toast.error("Download Failed", { description: failMsg });
         } else if (job.status === "cancelled") {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           setIsSubmitting(false);
           setActiveJob(null);
+          toast.info("Download Cancelled");
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -240,6 +247,7 @@ export function DownloadBox() {
         setUrl(text);
         setIsCopied(true);
         setErrorMsg(null);
+        toast.info("Link pasted", { description: "Inspecting video formats..." });
         setTimeout(() => setIsCopied(false), 2000);
       }
     } catch {
@@ -272,7 +280,13 @@ export function DownloadBox() {
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!url || isSubmitting) return;
+    if (!url.trim()) {
+      toast.error("Please enter a YouTube URL", {
+        description: "Paste a video link in the box above.",
+      });
+      return;
+    }
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
     setErrorMsg(null);
@@ -283,7 +297,7 @@ export function DownloadBox() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url,
+          url: url.trim(),
           type: mediaType,
           quality: mediaType === "video" ? quality : "best",
         }),
@@ -298,15 +312,19 @@ export function DownloadBox() {
       if (data?.jobId && data?.job) {
         setActiveJob(data.job);
         startPollingJob(data.jobId);
+        toast.info("Processing Started", {
+          description: "Fetching and converting media on our servers...",
+        });
       } else {
         throw new Error("Invalid server response.");
       }
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
-      setErrorMsg(
-        error instanceof Error ? error.message : "Something went wrong. Please try again."
-      );
+      const msg =
+        error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      setErrorMsg(msg);
+      toast.error("Download Error", { description: msg });
     }
   };
 
