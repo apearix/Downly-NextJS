@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { 
-  Link2, 
-  ArrowDown, 
-  Clipboard, 
-  Check, 
-  X, 
-  Loader2, 
+import {
+  Link2,
+  ArrowDown,
+  Clipboard,
+  Check,
+  X,
+  Loader2,
   Music2,
   SlidersHorizontal,
   Video,
@@ -271,7 +271,7 @@ export function DownloadBox() {
     const currentBase = apiBase || getApiBaseUrl();
     try {
       await fetch(`${currentBase}/api/jobs/${activeJob.id}`, { method: "DELETE" });
-    } catch {}
+    } catch { }
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     setActiveJob(null);
     setIsSubmitting(false);
@@ -335,31 +335,29 @@ export function DownloadBox() {
 
   const isJobRunning = Boolean(
     activeJob &&
-      (activeJob.status === "queued" ||
-        activeJob.status === "analyzing" ||
-        activeJob.status === "downloading" ||
-        activeJob.status === "processing")
+    (activeJob.status === "queued" ||
+      activeJob.status === "analyzing" ||
+      activeJob.status === "downloading" ||
+      activeJob.status === "processing")
   );
 
   return (
     <div id="download" className="relative mx-auto mt-8 max-w-3xl">
       {/* Dynamic Back-Glow */}
-      <div 
-        className={`absolute -inset-1.5 rounded-[32px] bg-gradient-to-r from-[#74da03]/30 via-[#D7FF66]/20 to-[#74da03]/30 blur-2xl transition-opacity duration-500 pointer-events-none ${
-          isFocused || isJobRunning ? "opacity-100" : "opacity-45"
-        }`} 
+      <div
+        className={`absolute -inset-1.5 rounded-[32px] bg-gradient-to-r from-[#74da03]/30 via-[#D7FF66]/20 to-[#74da03]/30 blur-2xl transition-opacity duration-500 pointer-events-none ${isFocused || isJobRunning ? "opacity-100" : "opacity-45"
+          }`}
       />
 
       <div className="relative rounded-[28px] border border-[rgba(11,15,13,0.1)] bg-white p-3 sm:p-3.5 shadow-[0_20px_60px_-15px_rgba(11,15,13,0.08)] transition-all">
-        
+
         {/* Main URL Bar */}
         <form onSubmit={handleDownload} className="flex flex-col gap-2.5 sm:flex-row">
-          <div 
-            className={`group relative flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-4 py-1.5 transition-all duration-200 ${
-              isFocused 
-                ? "border-[#0B0F0D] bg-white ring-4 ring-[#74da03]/15" 
+          <div
+            className={`group relative flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-4 py-1.5 transition-all duration-200 ${isFocused
+                ? "border-[#0B0F0D] bg-white ring-4 ring-[#74da03]/15"
                 : "border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/60 hover:bg-[#F7F8F6]"
-            }`}
+              }`}
           >
             {/* Left status / platform icon */}
             {detectedPlatform ? (
@@ -439,14 +437,14 @@ export function DownloadBox() {
 
         {/* Error Alert Banner */}
         {errorMsg && (
-          <div 
-            role="alert" 
+          <div
+            role="alert"
             className="mt-3 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50/80 px-4 py-2.5 text-xs font-semibold text-red-700 animate-in fade-in"
           >
             <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
             <span className="flex-1">{errorMsg}</span>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setErrorMsg(null)}
               className="text-red-500 hover:text-red-700"
             >
@@ -457,7 +455,7 @@ export function DownloadBox() {
 
         {/* Real Progress Bar Display */}
         {activeJob && (
-          <div 
+          <div
             aria-live="polite"
             className="mt-3 rounded-2xl border border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/80 p-3 sm:p-3.5 shadow-xs transition-all"
           >
@@ -491,7 +489,7 @@ export function DownloadBox() {
 
             {/* Visual Bar Track */}
             <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-black/5">
-              <div 
+              <div
                 className="h-full rounded-full bg-gradient-to-r from-[#74da03] to-[#aef500] transition-all duration-300"
                 style={{ width: `${Math.max(activeJob.progress.percentage, 4)}%` }}
               />
@@ -552,13 +550,13 @@ export function DownloadBox() {
             </div>
           </div>
         ) : mediaInfo && (
-          <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-2xl border border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/80 p-3 shadow-xs transition-all">
+          <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3 rounded-2xl border border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/80 p-3 shadow-xs transition-all">
             {/* Thumbnail with duration badge */}
-            <div className="relative h-20 w-full sm:w-32 shrink-0 overflow-hidden rounded-xl bg-black/5">
+            <div className="relative aspect-video w-full sm:w-36 shrink-0 overflow-hidden rounded-xl bg-black/5">
               {mediaInfo.thumbnail ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img 
-                  src={mediaInfo.thumbnail} 
+                <img
+                  src={mediaInfo.thumbnail}
                   alt={mediaInfo.title}
                   loading="lazy"
                   className="h-full w-full object-cover"
@@ -577,10 +575,10 @@ export function DownloadBox() {
 
             {/* Video Details */}
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-              <h3 className="line-clamp-2 text-xs sm:text-sm font-bold text-[#0B0F0D] leading-snug">
+              <h3 className="line-clamp-2 text-left text-sm  md:text-lg font-semibold text-[#0B0F0D] leading-snug mb-0.5">
                 {mediaInfo.title}
               </h3>
-              <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold text-[#738079]">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-[#738079]">
                 {mediaInfo.channel && (
                   <span className="flex items-center gap-1">
                     <UserIcon className="h-3 w-3" />
@@ -593,9 +591,7 @@ export function DownloadBox() {
                     {formatDuration(mediaInfo.duration)}
                   </span>
                 ) : null}
-                <span className="rounded-md bg-black/5 px-1.5 py-0.5 text-[10px] font-bold text-[#0B0F0D]">
-                  {mediaInfo.qualities.length} qualities ready
-                </span>
+                 
               </div>
             </div>
           </div>
@@ -603,7 +599,7 @@ export function DownloadBox() {
 
         {/* Quick Format & Quality Bar */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[rgba(11,15,13,0.06)] px-2 pt-2.5 text-xs text-[#738079]">
-          
+
           {/* Format Tabs */}
           <div className="flex items-center gap-1">
             <span className="mr-1 hidden font-semibold text-[#0B0F0D] sm:inline">Format:</span>
@@ -611,11 +607,10 @@ export function DownloadBox() {
               type="button"
               disabled={isJobRunning}
               onClick={() => { setMediaType("video"); }}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
-                mediaType === "video"
+              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${mediaType === "video"
                   ? "bg-[#0B0F0D] text-[#74da03]"
                   : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
-              }`}
+                }`}
             >
               Video (MP4)
             </button>
@@ -623,11 +618,10 @@ export function DownloadBox() {
               type="button"
               disabled={isJobRunning}
               onClick={() => { setMediaType("audio"); }}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
-                mediaType === "audio"
+              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${mediaType === "audio"
                   ? "bg-[#0B0F0D] text-[#74da03]"
                   : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
-              }`}
+                }`}
             >
               Audio (MP3)
             </button>
@@ -644,11 +638,10 @@ export function DownloadBox() {
                     type="button"
                     disabled={isJobRunning}
                     onClick={() => setQuality(res.id)}
-                    className={`rounded-md px-2 py-1 text-[11px] font-bold transition whitespace-nowrap ${
-                      quality === res.id 
-                        ? "bg-[#74da03]/40 text-[#0B0F0D] ring-1 ring-[#0B0F0D]/20" 
+                    className={`rounded-md px-2 py-1 text-[11px] font-bold transition whitespace-nowrap ${quality === res.id
+                        ? "bg-[#74da03]/40 text-[#0B0F0D] ring-1 ring-[#0B0F0D]/20"
                         : "text-[#738079] hover:bg-black/5 hover:text-[#0B0F0D]"
-                    }`}
+                      }`}
                   >
                     {res.label}
                   </button>
@@ -660,8 +653,8 @@ export function DownloadBox() {
               </span>
             )}
           </div>
-        </div> 
-      </div>  
+        </div>
+      </div>
     </div>
   );
 }
