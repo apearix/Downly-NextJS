@@ -50,11 +50,10 @@ export function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 h-20 z-[1000] transition-all duration-300 ${
-          isScrolled
+        className={`fixed top-0 left-0 right-0 h-20 z-[1000] transition-all duration-300 ${isScrolled
             ? "bg-[#F7F8F6]/85 backdrop-blur-md border-b border-[rgba(11,15,13,0.08)] shadow-xs"
             : "bg-transparent border-b border-transparent"
-        }`}
+          }`}
       >
         <div className="flex items-center justify-between h-full max-w-7xl mx-auto px-6 lg:px-8">
           {/* Logo */}
@@ -71,11 +70,10 @@ export function Header() {
                   key={name}
                   href={href}
                   onClick={() => setActiveSection(href.slice(1))}
-                  className={`px-5 py-2 text-sm rounded-full transition-all duration-200 ${
-                    active
+                  className={`px-5 py-2 text-sm rounded-full transition-all duration-200 ${active
                       ? "font-semibold text-[#0B0F0D] bg-white shadow-xs"
                       : "font-medium text-[#738079] hover:text-[#0B0F0D] hover:bg-black/5"
-                  }`}
+                    }`}
                 >
                   {name}
                 </Link>
@@ -86,7 +84,7 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             <Link
-               href="/download/downly.apk"
+              href="https://www.dropbox.com/scl/fi/aqnse9jd3bjrjwxtorila/downly.apk?rlkey=btvgkbrsocoafezpv22vlqekg&st=rvnkb7sk&dl=0"
               className="hidden sm:inline-flex items-center px-5 py-2.5 bg-[#0B0F0D] hover:bg-black text-sm text-[#B6FF00] font-semibold rounded-full shadow-sm hover:shadow-lg transition duration-200"
             >
               Download APK
@@ -107,16 +105,14 @@ export function Header() {
       {/* Mobile Backdrop */}
       <div
         onClick={() => setIsOpen(false)}
-        className={`fixed inset-0 bg-[#0B0F0D]/40 backdrop-blur-xs z-[1050] transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-[#0B0F0D]/40 backdrop-blur-xs z-[1050] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       />
 
       {/* Mobile Drawer */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[300px] max-w-[85vw] bg-white z-[1100] shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[300px] max-w-[85vw] bg-white z-[1100] shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex items-center justify-between px-6 h-20 border-b border-[rgba(11,15,13,0.06)]">
           <span className="font-bold text-[#0B0F0D] text-lg">Menu</span>
@@ -141,11 +137,10 @@ export function Header() {
                   setActiveSection(href.slice(1));
                   setIsOpen(false);
                 }}
-                className={`flex items-center justify-between text-base px-4 py-3 rounded-xl transition ${
-                  active
+                className={`flex items-center justify-between text-base px-4 py-3 rounded-xl transition ${active
                     ? "font-semibold text-[#0B0F0D] bg-[#F7F8F6] border border-[rgba(11,15,13,0.08)] shadow-2xs"
                     : "font-medium text-[#738079] hover:text-[#0B0F0D] hover:bg-[#F7F8F6]"
-                }`}
+                  }`}
               >
                 <span>{name}</span>
                 <ChevronRight className={`h-4 w-4 ${active ? "text-[#0B0F0D]" : "text-[#738079]/40"}`} />

@@ -39,7 +39,7 @@ export function CTA() {
               Paste any link and download your media quickly, simply, and without the clutter.
             </p>
             <Link
-              href="/download/downly.apk"
+              href="https://www.dropbox.com/scl/fi/aqnse9jd3bjrjwxtorila/downly.apk?rlkey=btvgkbrsocoafezpv22vlqekg&st=rvnkb7sk&dl=0"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               className="group mt-10 inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-bold text-black transition-all duration-300 hover:bg-[#A3E600] hover:shadow-[0_12px_32px_rgba(116,218,3,0.25)] active:scale-[0.98]"
