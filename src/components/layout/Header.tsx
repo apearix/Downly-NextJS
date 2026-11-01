@@ -86,10 +86,10 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             <Link
-              href="#download"
+               href="/download/downly.apk"
               className="hidden sm:inline-flex items-center px-5 py-2.5 bg-[#0B0F0D] hover:bg-black text-sm text-[#B6FF00] font-semibold rounded-full shadow-sm hover:shadow-lg transition duration-200"
             >
-              Start downloading
+              Download APK
             </Link>
 
             <button

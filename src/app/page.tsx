@@ -12,6 +12,7 @@ import {
   getHowToSchema,
   getFAQSchema,
 } from "@/lib/seo/schema";
+import { WhyDownloadApp } from "@/components/home/WhyDownloadApp";
 
 export default function Home() {
   const jsonLdSchemas = [
@@ -37,6 +38,7 @@ export default function Home() {
 
       <main className="flex-1">
         <Hero />
+        <WhyDownloadApp />
         <Features />
         <HowItWorks />
         <FAQ />

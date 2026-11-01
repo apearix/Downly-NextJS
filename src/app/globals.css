@@ -67,7 +67,7 @@ input {
 }
 
 ::selection {
-  background: #74da03;
+  background: var(--color-primary);
   color: #0B0F0D;
 }
 

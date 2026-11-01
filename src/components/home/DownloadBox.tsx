@@ -84,7 +84,7 @@ export function DownloadBox() {
       return { name: "X / Twitter", icon: Video, color: "text-sky-500" };
     }
     if (val.includes("soundcloud.com") || val.includes("spotify.com")) {
-      return { name: "Audio", icon: Music2, color: "text-[#74da03]" };
+      return { name: "Audio", icon: Music2, color: "text-primary" };
     }
     return null;
   };
@@ -355,8 +355,8 @@ export function DownloadBox() {
         <form onSubmit={handleDownload} className="flex flex-col gap-2.5 sm:flex-row">
           <div
             className={`group relative flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-4 py-1.5 transition-all duration-200 ${isFocused
-                ? "border-[#0B0F0D] bg-white ring-4 ring-[#74da03]/15"
-                : "border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/60 hover:bg-[#F7F8F6]"
+              ? "border-[#0B0F0D] bg-white ring-4 ring-[#74da03]/15"
+              : "border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/60 hover:bg-[#F7F8F6]"
               }`}
           >
             {/* Left status / platform icon */}
@@ -422,7 +422,7 @@ export function DownloadBox() {
             type="submit"
             disabled={isSubmitting || isJobRunning || !url}
             aria-label={isJobRunning ? "Download in progress" : "Start download"}
-            className="relative flex h-12 sm:h-auto items-center justify-center gap-2 rounded-2xl bg-[#74da03] px-8 text-sm font-bold text-[#0B0F0D] shadow-[0_4px_16px_rgba(182,255,0,0.4)] transition-all duration-200 hover:bg-[#aef500] hover:shadow-[0_6px_22px_rgba(182,255,0,0.5)] active:scale-[0.98] disabled:opacity-65 disabled:pointer-events-none min-h-[44px]"
+            className="relative flex h-12 sm:h-auto items-center justify-center gap-2 rounded-2xl bg-primary px-8 text-sm font-bold text-[#0B0F0D] shadow-[0_4px_16px_rgba(182,255,0,0.4)] transition-all duration-200 hover:bg-[#aef500] hover:shadow-[0_6px_22px_rgba(182,255,0,0.5)] active:scale-[0.98] disabled:opacity-65 disabled:pointer-events-none min-h-[44px]"
           >
             {isSubmitting || isJobRunning ? (
               <Loader2 className="h-5 w-5 animate-spin text-[#0B0F0D]" />
@@ -464,7 +464,7 @@ export function DownloadBox() {
                 {activeJob.status === "completed" ? (
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
                 ) : (
-                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#74da03]" />
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
                 )}
                 <span className="font-bold text-[#0B0F0D] truncate">
                   {activeJob.progress.phase || (activeJob.status === "completed" ? "Download Ready ✓" : "Processing...")}
@@ -540,7 +540,7 @@ export function DownloadBox() {
         {isAnalyzing ? (
           <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[rgba(11,15,13,0.06)] bg-[#F7F8F6]/60 p-3">
             <div className="flex h-16 w-24 shrink-0 animate-pulse items-center justify-center rounded-xl bg-black/5">
-              <Loader2 className="h-5 w-5 animate-spin text-[#74da03]" />
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
             </div>
             <div className="flex-1 space-y-1.5">
               <div className="h-4 w-3/4 animate-pulse rounded-md bg-black/5" />
@@ -591,7 +591,7 @@ export function DownloadBox() {
                     {formatDuration(mediaInfo.duration)}
                   </span>
                 ) : null}
-                 
+
               </div>
             </div>
           </div>
@@ -608,8 +608,8 @@ export function DownloadBox() {
               disabled={isJobRunning}
               onClick={() => { setMediaType("video"); }}
               className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${mediaType === "video"
-                  ? "bg-[#0B0F0D] text-[#74da03]"
-                  : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
+                ? "bg-[#0B0F0D] text-primary"
+                : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
                 }`}
             >
               Video (MP4)
@@ -619,8 +619,8 @@ export function DownloadBox() {
               disabled={isJobRunning}
               onClick={() => { setMediaType("audio"); }}
               className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${mediaType === "audio"
-                  ? "bg-[#0B0F0D] text-[#74da03]"
-                  : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
+                ? "bg-[#0B0F0D] text-primary"
+                : "text-[#738079] hover:bg-[#F1F3EE] hover:text-[#0B0F0D]"
                 }`}
             >
               Audio (MP3)
@@ -639,8 +639,8 @@ export function DownloadBox() {
                     disabled={isJobRunning}
                     onClick={() => setQuality(res.id)}
                     className={`rounded-md px-2 py-1 text-[11px] font-bold transition whitespace-nowrap ${quality === res.id
-                        ? "bg-[#74da03]/40 text-[#0B0F0D] ring-1 ring-[#0B0F0D]/20"
-                        : "text-[#738079] hover:bg-black/5 hover:text-[#0B0F0D]"
+                      ? "bg-primary/40 text-[#0B0F0D] ring-1 ring-[#0B0F0D]/20"
+                      : "text-[#738079] hover:bg-black/5 hover:text-[#0B0F0D]"
                       }`}
                   >
                     {res.label}
@@ -648,7 +648,7 @@ export function DownloadBox() {
                 ))}
               </div>
             ) : (
-              <span className="rounded-md bg-[#74da03]/30 px-2.5 py-1 text-[11px] font-bold text-[#0B0F0D]">
+              <span className="rounded-md bg-primary/30 px-2.5 py-1 text-[11px] font-bold text-[#0B0F0D]">
                 Best Quality (HQ)
               </span>
             )}

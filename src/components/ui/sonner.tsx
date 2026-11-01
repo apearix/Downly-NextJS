@@ -131,17 +131,16 @@ export function Toaster({ position = "top-right" }: { position?: "top-right" | "
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
-            className={`pointer-events-auto flex items-start gap-3.5 w-full p-4 rounded-2xl border backdrop-blur-xl transition-all ${
-              item.type === "error"
-                ? "bg-[#0B0F0D]/95 border-red-500/35 text-white shadow-[0_12px_32px_-6px_rgba(239,68,68,0.25)]"
-                : item.type === "success"
+            className={`pointer-events-auto flex items-start gap-3.5 w-full p-4 rounded-2xl border backdrop-blur-xl transition-all ${item.type === "error"
+              ? "bg-[#0B0F0D]/95 border-red-500/35 text-white shadow-[0_12px_32px_-6px_rgba(239,68,68,0.25)]"
+              : item.type === "success"
                 ? "bg-[#0B0F0D]/95 border-[rgba(116,218,3,0.35)] text-white shadow-[0_12px_32px_-6px_rgba(116,218,3,0.25)]"
                 : "bg-[#0B0F0D]/95 border-white/15 text-white shadow-[0_12px_32px_-6px_rgba(0,0,0,0.4)]"
-            }`}
+              }`}
           >
             {item.type === "success" && (
-              <div className="h-7 w-7 rounded-xl bg-[#74da03]/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
-                <CheckCircle2 className="h-4 w-4 text-[#74da03]" />
+              <div className="h-7 w-7 rounded-xl bg-primary/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
               </div>
             )}
             {item.type === "error" && (
@@ -150,13 +149,13 @@ export function Toaster({ position = "top-right" }: { position?: "top-right" | "
               </div>
             )}
             {item.type === "info" && (
-              <div className="h-7 w-7 rounded-xl bg-[#74da03]/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
-                <Info className="h-4 w-4 text-[#74da03]" />
+              <div className="h-7 w-7 rounded-xl bg-primary/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
+                <Info className="h-4 w-4 text-primary" />
               </div>
             )}
             {item.type === "loading" && (
-              <div className="h-7 w-7 rounded-xl bg-[#74da03]/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
-                <Loader2 className="h-4 w-4 text-[#74da03] animate-spin" />
+              <div className="h-7 w-7 rounded-xl bg-primary/15 border border-[#74da03]/30 flex items-center justify-center shrink-0 mt-0.5">
+                <Loader2 className="h-4 w-4 text-primary animate-spin" />
               </div>
             )}
 
